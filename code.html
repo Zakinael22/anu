@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeKids Connect - Parental Control App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .active-tab {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: red;
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .child-card {
+            transition: all 0.3s ease;
+        }
+        .child-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .backdrop-blur {
+            backdrop-filter: blur(5px);
+        }
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #3b82f6;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Main App Container -->
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Parent App View (Default) -->
+        <div id="parent-app" class="flex-grow">
+            <!-- Header -->
+            <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="https://placehold.co/40x40" alt="SafeKids Connect logo - A shield icon with parent and child silhouettes inside" class="mr-3">
+                    <h1 class="text-xl font-bold text-gray-800">SafeKids Connect</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="notification-btn" class="relative text-gray-600 hover:text-blue-500">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/36x36" alt="Parent profile picture" class="rounded-full">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="container mx-auto px-4 py-6">
+                <!-- Dashboard Overview -->
+                <section class="mb-8">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">Dashboard Overview</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-gray-500">Connected Devices</h3>
+                            <p class="text-3xl font-bold text-blue-500">2</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-gray-500">Screen Time Today</h3>
+                            <p class="text-3xl font-bold text-orange-500">1.5h</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-gray-500">Active Alerts</h3>
+                            <p class="text-3xl font-bold text-red-500">1</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-gray-500">Recent Requests</h3>
+                            <p class="text-3xl font-bold text-green-500">3</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Children Status Cards -->
+                <section class="mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Your Children</h2>
+                        <button id="add-child-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add Child
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Child Card 1 -->
+                        <div class="child-card bg-white rounded-lg shadow overflow-hidden">
+                            <div class="flex items-center p-4 border-b">
+                                <img src="https://placehold.co/60x60" alt="Child profile picture - 8 year old boy smiling" class="rounded-full mr-4">
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">Michael Johnson</h3>
+                                    <p class="text-sm text-gray-500">Last active: 10 min ago</p>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <div>
+                                        <p class="font-medium text-gray-800">Screen Time</p>
+                                        <p class="text-sm text-gray-500">Limit: 2 hours (1h 15m used)</p>
+                                    </div>
+                                    <div class="w-16 h-16">
+                                        <svg class="w-full h-full" viewBox="0 0 36 36">
+                                            <path d="M18 2.0845
+                                                a 15.9155 15.9155 0 0 1 0 31.831
+                                                a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                fill="none" stroke="#e6e6e6" stroke-width="2.5"/>
+                                            <path d="M18 2.0845
+                                                a 15.9155 15.9155 0 0 1 0 31.831
+                                                a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-dasharray="75, 100"/>
+                                            <text x="18" y="20.5" text-anchor="middle" font-size="0.5em" fill="#3b82f6">75%</text>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <div>
+                                        <p class="font-medium text-gray-800">Location</p>
+                                        <p class="text-sm text-gray-500">Home - WiFi Connected</p>
+                                    </div>
+                                    <span class="flex items-center text-green-500">
+                                        <i class="fas fa-map-marker-alt mr-1"></i>
+                                        <span>See Map</span>
+                                    </span>
+                                </div>
+                                <button class="w-full mt-2 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-cog mr-2"></i> Manage Device
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Child Card 2 -->
+                        <div class="child-card bg-white rounded-lg shadow overflow-hidden">
+                            <div class="flex items-center p-4 border-b">
+                                <img src="https://placehold.co/60x60" alt="Child profile picture - 12 year old girl with glasses" class="rounded-full mr-4">
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">Sarah Johnson</h3>
+                                    <p class="text-sm text-gray-500">Last active: 1 hour ago</p>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <div>
+                                        <p class="font-medium text-gray-800">Screen Time</p>
+                                        <p class="text-sm text-gray-500">Limit: 3 hours (2h 45m used)</p>
+                                    </div>
+                                    <div class="w-16 h-16">
+                                        <svg class="w-full h-full" viewBox="0 0 36 36">
+                                            <path d="M18 2.0845
+                                                a 15.9155 15.9155 0 0 1 0 31.831
+                                                a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                fill="none" stroke="#e6e6e6" stroke-width="2.5"/>
+                                            <path d="M18 2.0845
+                                                a 15.9155 15.9155 0 0 1 0 31.831
+                                                a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                fill="none" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="90, 100"/>
+                                            <text x="18" y="20.5" text-anchor="middle" font-size="0.5em" fill="#ef4444">90%</text>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <div>
+                                        <p class="font-medium text-gray-800">Location</p>
+                                        <p class="text-sm text-gray-500">School - Cellular</p>
+                                    </div>
+                                    <span class="flex items-center text-green-500">
+                                        <i class="fas fa-map-marker-alt mr-1"></i>
+                                        <span>See Map</span>
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <p class="text-sm font-medium text-gray-800">Attention Needed</p>
+                                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Alert</span>
+                                </div>
+                                <button class="w-full mt-2 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-cog mr-2"></i> Manage Device
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Actions -->
+                <section class="mb-8">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">Quick Actions</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <button class="bg-white hover:bg-gray-50 rounded-lg shadow p-4 flex flex-col items-center">
+                            <div class="bg-blue-100 text-blue-500 p-3 rounded-full mb-2">
+                                <i class="fas fa-clock text-xl"></i>
+                            </div>
+                            <span class="text-sm font-medium">Screen Time</span>
+                        </button>
+                        <button class="bg-white hover:bg-gray-50 rounded-lg shadow p-4 flex flex-col items-center">
+                            <div class="bg-green-100 text-green-500 p-3 rounded-full mb-2">
+                                <i class="fas fa-map-marker-alt text-xl"></i>
+                            </div>
+                            <span class="text-sm font-medium">Location</span>
+                        </button>
+                        <button class="bg-white hover:bg-gray-50 rounded-lg shadow p-4 flex flex-col items-center">
+                            <div class="bg-purple-100 text-purple-500 p-3 rounded-full mb-2">
+                                <i class="fas fa-ban text-xl"></i>
+                            </div>
+                            <span class="text-sm font-medium">Block Apps</span>
+                        </button>
+                        <button class="bg-white hover:bg-gray-50 rounded-lg shadow p-4 flex flex-col items-center">
+                            <div class="bg-orange-100 text-orange-500 p-3 rounded-full mb-2">
+                                <i class="fas fa-file-alt text-xl"></i>
+                            </div>
+                            <span class="text-sm font-medium">Reports</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Recent Activity -->
+                <section>
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">Recent Activity</h2>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="flex border-b">
+                            <button class="py-3 px-6 font-medium active-tab">All</button>
+                            <button class="py-3 px-6 font-medium text-gray-500">Alerts</button>
+                            <button class="py-3 px-6 font-medium text-gray-500">Requests</button>
+                        </div>
+                        <div class="divide-y">
+                            <!-- Activity Item 1 -->
+                            <div class="p-4">
+                                <div class="flex justify-between mb-1">
+                                    <div class="flex items-center">
+                                        <span class="bg-blue-100 text-blue-500 p-2 rounded-full mr-3">
+                                            <i class="fas fa-clock"></i>
+                                        </span>
+                                        <div>
+                                            <p class="font-medium">Screen Time Warning</p>
+                                            <p class="text-sm text-gray-500">Michael has used 75% of daily screen time</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm text-gray-400">15 min ago</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Activity Item 2 -->
+                            <div class="p-4">
+                                <div class="flex justify-between mb-1">
+                                    <div class="flex items-center">
+                                        <span class="bg-green-100 text-green-500 p-2 rounded-full mr-3">
+                                            <i class="fas fa-comment"></i>
+                                        </span>
+                                        <div>
+                                            <p class="font-medium">New Request</p>
+                                            <p class="text-sm text-gray-500">Sarah requested extra 30 minutes of screen time</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm text-gray-400">45 min ago</span>
+                                </div>
+                                <div class="flex justify-end mt-2 space-x-2">
+                                    <button class="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded-lg">Approve</button>
+                                    <button class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg">Deny</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Activity Item 3 -->
+                            <div class="p-4">
+                                <div class="flex justify-between mb-1">
+                                    <div class="flex items-center">
+                                        <span class="bg-red-100 text-red-500 p-2 rounded-full mr-3">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </span>
+                                        <div>
+                                            <p class="font-medium">Location Alert</p>
+                                            <p class="text-sm text-gray-500">Michael's device left home area</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm text-gray-400">1 hour ago</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Activity Item 4 -->
+                            <div class="p-4">
+                                <div class="flex justify-between mb-1">
+                                    <div class="flex items-center">
+                                        <span class="bg-purple-100 text-purple-500 p-2 rounded-full mr-3">
+                                            <i class="fas fa-ban"></i>
+                                        </span>
+                                        <div>
+                                            <p class="font-medium">App Blocked</p>
+                                            <p class="text-sm text-gray-500">Game 'Roblox' is blocked after 8 PM</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm text-gray-400">2 hours ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Bottom Navigation -->
+            <nav class="bg-white border-t fixed bottom-0 left-0 right-0 flex justify-around py-3">
+                <button class="flex flex-col items-center text-blue-500">
+                    <i class="fas fa-home text-xl"></i>
+                    <span class="text-xs">Home</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-500">
+                    <i class="fas fa-chart-bar text-xl"></i>
+                    <span class="text-xs">Activity</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-500">
+                    <i class="fas fa-map-marked-alt text-xl"></i>
+                    <span class="text-xs">Location</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-500">
+                    <i class="fas fa-sliders-h text-xl"></i>
+                    <span class="text-xs">Settings</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Child App View (Hidden by Default) -->
+        <div id="child-app" class="hidden flex-grow">
+            <!-- Header -->
+            <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="https://placehold.co/40x40" alt="SafeKids Connect logo - Child version with playful colors" class="mr-3">
+                    <h1 class="text-xl font-bold text-gray-800">Kids Space</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="relative text-gray-600 hover:text-blue-500">
+                        <i class="fas fa-question-circle text-xl"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="container mx-auto px-4 py-6">
+                <!-- Current Status -->
+                <section class="mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800">My Device Status</h2>
+                            <img src="https://placehold.co/80x80" alt="Parent profile thumbnail" class="rounded-full w-12 h-12 border-2 border-blue-300">
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="bg-blue-100 p-3 rounded-full mr-3">
+                                        <i class="fas fa-clock text-blue-500"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-800">Screen Time</p>
+                                        <p class="text-sm text-gray-500">
+                                            <span id="remaining-time">1 hour 15 minutes</span> remaining
+                                        </p>
+                                    </div>
+                                </div>
+                                <button id="request-time-btn" class="text-blue-500 hover:text-blue-700 flex items-center">
+                                    <i class="fas fa-plus-circle mr-1"></i> Request More
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="bg-green-100 p-3 rounded-full mr-3">
+                                        <i class="fas fa-check-circle text-green-500"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-800">Allowed Apps</p>
+                                        <p class="text-sm text-gray-500">23 of 25 apps available</p>
+                                    </div>
+                                </div>
+                                <button class="text-blue-500 hover:text-blue-700">See All</button>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="bg-purple-100 p-3 rounded-full mr-3">
+                                    <i class="fas fa-info-circle text-purple-500"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-800">Bedtime Rules</p>
+                                    <p class="text-sm text-gray-500">Device locks from 9:00 PM to 7:00 AM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Actions -->
+                <section class="mb-8">
+                    <h2 class="text-lg font-semibold mb-4 text-gray-800">What do you want to do?</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button class="bg-white hover:bg-gray-50 rounded-lg shadow p-4 flex flex-col items-center">
+                            <div class="bg-blue-100 text-blue-500 p-3 rounded-full mb-2">
+                                <i class="fas fa-gamepad text-xl"></i>
+                            </div>
+                            <span class="text-sm font-medium">Games</span>
+                        </button>
+                        <button class="bg-white hover:bg-gray-50 rounded-lg shadow p-4 flex flex-col items-center">
+                            <div class="bg-green-100 text-green-500 p-3 rounded-full mb-2">
+                                <i class="fas fa-book text-xl"></i>
+                            </div>
+                            <span class="text-sm font-medium">Learning</span>
+                        </button>
+                        <button class="bg-white hover:bg-gray-50 rounded-lg shadow p-4 flex flex-col items-center">
+                            <div class="bg-purple-100 text-purple-500 p-3 rounded-full mb-2">
+                                <i class="fas fa-music text-xl"></i>
+                            </div>
+                            <span class="text-sm font-medium">Music</span>
+                        </button>
+                        <button class="bg-white hover:bg-gray-50 rounded-lg shadow p-4 flex flex-col items-center">
+                            <div class="bg-orange-100 text-orange-500 p-3 rounded-full mb-2">
+                                <i class="fas fa-video text-xl"></i>
+                            </div>
+                            <span class="text-sm font-medium">Videos</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Current Requests -->
+                <section>
+                    <h2 class="text-lg font-semibold mb-4 text-gray-800">My Requests</h2>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="divide-y">
+                            <!-- Request Item 1 -->
+                            <div class="p-4">
+                                <div class="flex justify-between items-center mb-1">
+                                    <div class="flex items-center">
+                                        <span class="bg-blue-100 text-blue-500 p-2 rounded-full mr-3">
+                                            <i class="fas fa-clock"></i>
+                                        </span>
+                                        <div>
+                                            <p class="font-medium">Extra Screen Time</p>
+                                            <p class="text-sm text-gray-500">Requested 30 minutes more today</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm text-yellow-500 font-medium">Pending</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Request Item 2 -->
+                            <div class="p-4">
+                                <div class="flex justify-between items-center mb-1">
+                                    <div class="flex items-center">
+                                        <span class="bg-green-100 text-green-500 p-2 rounded-full mr-3">
+                                            <i class="fas fa-plus-square"></i>
+                                        </span>
+                                        <div>
+                                            <p class="font-medium">New App Request</p>
+                                            <p class="text-sm text-gray-500">"Minecraft" game app</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm text-green-500 font-medium">Approved</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Request Item 3 -->
+                            <div class="p-4">
+                                <div class="flex justify-between items-center mb-1">
+                                    <div class="flex items-center">
+                                        <span class="bg-purple-100 text-purple-500 p-2 rounded-full mr-3">
+                                            <i class="fas fa-moon"></i>
+                                        </span>
+                                        <div>
+                                            <p class="font-medium">Bedtime Extension</p>
+                                            <p class="text-sm text-gray-500">Requested 1 hour delay on Friday</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm text-red-500 font-medium">Denied</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1 italic">"You have school tomorrow!" - Mom</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Bottom Navigation -->
+            <nav class="bg-white border-t fixed bottom-0 left-0 right-0 flex justify-around py-3">
+                <button class="flex flex-col items-center text-blue-500">
+                    <i class="fas fa-home text-xl"></i>
+                    <span class="text-xs">Home</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-500">
+                    <i class="fas fa-list text-xl"></i>
+                    <span class="text-xs">Apps</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-500">
+                    <i class="fas fa-history text-xl"></i>
+                    <span class="text-xs">History</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-500">
+                    <i class="fas fa-user-cog text-xl"></i>
+                    <span class="text-xs">Settings</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Modal for Adding Child -->
+        <div id="add-child-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4">Add New Child Device</h3>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2">Pairing Method</label>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <button class="border border-blue-500 text-blue-500 py-2 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-qrcode mr-2"></i> QR Code
+                            </button>
+                            <button class="border border-blue-500 text-blue-500 py-2 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-key mr-2"></i> Manual Code
+                            </button>
+                        </div>
+                        
+                        <div id="qr-code-section" class="flex flex-col items-center py-4 hidden">
+                            <div class="bg-white p-4 rounded-lg shadow border mb-4">
+                                <img src="https://placehold.co/200x200" alt="Pairing QR code - scan this with child device" class="w-48 h-48 mx-auto">
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4">Scan this QR code with the child's device</p>
+                            <button class="text-blue-500 hover:text-blue-700">
+                                <i class="fas fa-sync-alt mr-1"></i> Generate New Code
+                            </button>
+                        </div>
+                        
+                        <div id="manual-code-section" class="hidden">
+                            <div class="bg-gray-100 p-4 rounded-lg text-center mb-4">
+                                <p class="text-sm font-medium text-gray-500 mb-1">Pairing Code</p>
+                                <p class="text-2xl font-mono tracking-widest">X7B9-KL2M-N4P6</p>
+                            </div>
+                            <div class="flex items-center mb-4">
+                                <div class="flex-grow h-px bg-gray-200"></div>
+                                <span class="mx-4 text-gray-500">or</span>
+                                <div class="flex-grow h-px bg-gray-200"></div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">Enter Child's Code</label>
+                                <input type="text" class="w-full px-3 py-2 border rounded-lg" placeholder="123-456-789">
+                            </div>
+                            <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg">
+                                Connect Device
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-6 py-3 flex justify-end rounded-b-lg">
+                    <button id="cancel-pairing-btn" class="text-gray-500 hover:text-gray-700 mr-4">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Screen Time Request -->
+        <div id="request-time-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4">Request More Screen Time</h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Select Duration</label>
+                        <select class="w-full px-3 py-2 border rounded-lg">
+                            <option>15 minutes</option>
+                            <option>30 minutes</option>
+                            <option>45 minutes</option>
+                            <option>1 hour</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Reason (optional)</label>
+                        <textarea class="w-full px-3 py-2 border rounded-lg" rows="3" placeholder="Example: I need to finish my homework"></textarea>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                            <span class="text-sm text-gray-600">Your parents will review this request</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-6 py-3 flex justify-end rounded-b-lg">
+                    <button class="text-gray-500 hover:text-gray-700 mr-4">
+                        Cancel
+                    </button>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                        Send Request
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Device Management -->
+        <div id="manage-device-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex items-center mb-6">
+                        <img src="https://placehold.co/60x60" alt="Child profile picture - 8 year old boy smiling" class="rounded-full mr-4">
+                        <div>
+                            <h3 class="text-xl font-semibold">Michael Johnson</h3>
+                            <p class="text-sm text-gray-500">Samsung Galaxy Tab A8</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-medium mb-3">Device Information</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p class="text-gray-500">OS Version</p>
+                                    <p>Android 11</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Last Active</p>
+                                    <p>10 min ago</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Storage</p>
+                                    <p>32 GB (12 GB free)</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">Battery</p>
+                                    <p>78%</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-medium mb-3">Screen Time Rules</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium">Weekday Limit</p>
+                                        <p class="text-sm text-gray-500">Monday through Friday</p>
+                                    </div>
+                                    <p>2 hours/day</p>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium">Weekend Limit</p>
+                                        <p class="text-sm text-gray-500">Saturday and Sunday</p>
+                                    </div>
+                                    <p>3 hours/day</p>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium">Bedtime Lock</p>
+                                        <p class="text-sm text-gray-500">Automatically locks device</p>
+                                    </div>
+                                    <p>9:00 PM - 7:00 AM</p>
+                                </div>
+                                <button class="w-full mt-2 text-blue-500 hover:text-blue-700 py-2 rounded-lg border border-blue-300">
+                                    Edit Settings
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-medium mb-3">App Restrictions</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img src="https://placehold.co/40x40" alt="YouTube app icon" class="rounded mr-2">
+                                        <span>YouTube</span>
+                                    </div>
+                                    <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                        <input type="checkbox" id="youtube-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
+                                        <label for="youtube-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img src="https://placehold.co/40x40" alt="Roblox app icon" class="rounded mr-2">
+                                        <span>Roblox</span>
+                                    </div>
+                                    <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                        <input type="checkbox" id="roblox-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
+                                        <label for="roblox-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img src="https://placehold.co/40x40" alt="TikTok app icon" class="rounded mr-2">
+                                        <span>TikTok</span>
+                                    </div>
+                                    <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                        <input type="checkbox" id="tiktok-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                        <label for="tiktok-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-red-300 cursor-pointer"></label>
+                                    </div>
+                                </div>
+                                <button class="w-full mt-2 text-blue-500 hover:text-blue-700 py-2 rounded-lg border border-blue-300">
+                                    Manage All Apps
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-medium mb-3">Location Tracking</h4>
+                            <div class="flex items-center justify-between mb-2">
+                                <div>
+                                    <p class="font-medium">Current Location</p>
+                                    <p class="text-sm text-gray-500">Home - WiFi Connected</p>
+                                </div>
+                                <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg">
+                                    View Map
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Safety Zones</p>
+                                    <p class="text-sm text-gray-500">Get alerts outside safe areas</p>
+                                </div>
+                                <button class="text-blue-500 hover:text-blue-700">
+                                    Manage
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h4 class="font-medium mb-3">Content Filtering</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span>Web Filter</span>
+                                    <span class="text-sm text-gray-700">Family-Friendly</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>Search Restrictions</span>
+                                    <span class="text-sm text-gray-700">Strict</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>YouTube Restricted Mode</span>
+                                    <span class="text-sm text-gray-700">On</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-6 py-3 flex justify-end rounded-b-lg">
+                    <button id="close-manage-modal" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                        Done
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const parentApp = document.getElementById('parent-app');
+        const childApp = document.getElementById('child-app');
+        const addChildBtn = document.getElementById('add-child-btn');
+        const addChildModal = document.getElementById('add-child-modal');
+        const cancelPairingBtn = document.getElementById('cancel-pairing-btn');
+        const requestTimeBtn = document.getElementById('request-time-btn');
+        const requestTimeModal = document.getElementById('request-time-modal');
+        const qrCodeSection = document.getElementById('qr-code-section');
+        const manualCodeSection = document.getElementById('manual-code-section');
+        const closeManageModal = document.getElementById('close-manage-modal');
+        const manageDeviceModal = document.getElementById('manage-device-modal');
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show parent app by default
+            parentApp.classList.remove('hidden');
+            childApp.classList.add('hidden');
+            
+            // Toggle between parent and child app (for demo purposes)
+            setTimeout(() => {
+                // parentApp.classList.add('hidden');
+                // childApp.classList.remove('hidden');
+            }, 500);
+        });
+
+        // Modal for adding a child device
+        addChildBtn.addEventListener('click', () => {
+            addChildModal.classList.remove('hidden');
+            qrCodeSection.classList.remove('hidden');
+            manualCodeSection.classList.add('hidden');
+        });
+
+        cancelPairingBtn.addEventListener('click', () => {
+            addChildModal.classList.add('hidden');
+        });
+
+        // Toggle between QR code and manual code pairing
+        document.querySelectorAll('[id$="-section"]').forEach(section => {
+            if (section.id === 'qr-code-section') {
+                section.previousElementSibling.children[0].addEventListener('click', () => {
+                    qrCodeSection.classList.remove('hidden');
+                    manualCodeSection.classList.add('hidden');
+                });
+            } else if (section.id === 'manual-code-section') {
+                section.previousElementSibling.children[1].addEventListener('click', () => {
+                    manualCodeSection.classList.remove('hidden');
+                    qrCodeSection.classList.add('hidden');
+                });
+            }
+        });
+
+        // Screen time request modal
+        requestTimeBtn.addEventListener('click', () => {
+            requestTimeModal.classList.remove('hidden');
+        });
+
+        // Close modals when clicking outside
+        [addChildModal, requestTimeModal, manageDeviceModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
+
+        // Demo: Clicking "Manage Device" buttons opens the management modal
+        document.querySelectorAll('.child-card button').forEach(button => {
+            if (button.textContent.includes('Manage Device')) {
+                button.addEventListener('click', () => {
+                    manageDeviceModal.classList.remove('hidden');
+                });
+            }
+        });
+
+        closeManageModal.addEventListener('click', () => {
+            manageDeviceModal.classList.add('hidden');
+        });
+
+        // Toggle switches functionality
+        document.querySelectorAll('.toggle-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const label = this.nextElementSibling;
+                if (this.checked) {
+                    label.classList.remove('bg-red-300');
+                    label.classList.add('bg-gray-300');
+                } else {
+                    label.classList.remove('bg-gray-300');
+                    label.classList.add('bg-red-300');
+                }
+            });
+        });
+
+        // Tab switching in activity section
+        const tabs = document.querySelectorAll('#parent-app main section:last-child button');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => {
+                    t.classList.remove('active-tab');
+                    t.classList.add('text-gray-500');
+                });
+                tab.classList.add('active-tab');
+                tab.classList.remove('text-gray-500');
+            });
+        });
+    </script>
+</body>
+</html>
